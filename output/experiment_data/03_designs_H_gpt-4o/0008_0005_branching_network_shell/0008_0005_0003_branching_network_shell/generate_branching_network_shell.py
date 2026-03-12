@@ -1,0 +1,102 @@
+# Created for 0008_0005_branching_network_shell.json
+
+""" Summary:
+The provided function, `generate_branching_network_shell`, creates a 3D architectural concept model based on the "branching network shell" metaphor. It generates a fractal-like structure with primary and secondary branching elements that embody organic rhythms and interconnectedness, reflecting natural systems. By using parameters like base radius and height, the function produces a semi-transparent layered shell to enhance light and air interaction. The model emphasizes fluid spatial organization, allowing for dynamic transitions and moments of pause. Through randomization, it ensures each iteration is unique, promoting an adaptable design that harmonizes with its environment."""
+
+#! python 3
+function_code = """def generate_branching_network_shell(seed: int, base_radius: float, height: float, num_primary_branches: int, num_secondary_branches: int):
+    \"""
+    Generates a 3D architectural Concept Model inspired by the 'branching network shell' metaphor.
+
+    This function creates a fractal-like matrix of branching elements that form a rhythmic and organic pattern.
+    The model features a semi-transparent layered shell emphasizing interaction with light and air, promoting growth
+    and harmony with the environment.
+
+    Parameters:
+    - seed (int): Seed for random number generation to ensure replicable results.
+    - base_radius (float): The radius of the base circle from which the branching network originates (meters).
+    - height (float): The total height of the structure (meters).
+    - num_primary_branches (int): The number of primary branching elements.
+    - num_secondary_branches (int): The number of secondary branches off each primary branch.
+
+    Returns:
+    - list: A list of Rhino.Geometry.Brep objects representing the 3D geometry of the concept model.
+    \"""
+    import Rhino.Geometry as rg
+    import random
+    import math
+
+    random.seed(seed)
+    
+    def create_branch(start_point, direction, length, radius, num_secondary_branches):
+        end_point = rg.Point3d(start_point.X + direction.X * length, start_point.Y + direction.Y * length, start_point.Z + direction.Z * length)
+        branch_curve = rg.LineCurve(start_point, end_point)
+        pipe = rg.Brep.CreatePipe(branch_curve, radius, True, rg.PipeCapMode.Round, True, 0.01, 0.01)[0]
+        
+        secondary_branches = []
+        for _ in range(num_secondary_branches):
+            angle = random.uniform(-math.pi / 4, math.pi / 4)
+            secondary_direction = rg.Vector3d(direction)
+            secondary_direction.Rotate(angle, rg.Vector3d.ZAxis)
+            secondary_length = length * random.uniform(0.5, 0.8)
+            secondary_radius = radius * 0.7
+            secondary_branches.append(create_branch(end_point, secondary_direction, secondary_length, secondary_radius, 0))
+        
+        return [pipe] + [item for sublist in secondary_branches for item in sublist]
+    
+    center = rg.Point3d(0, 0, 0)
+    base_angle_increment = (2 * math.pi) / num_primary_branches
+    primary_length = height / 2
+    primary_radius = base_radius * 0.1
+    
+    all_breps = []
+    for i in range(num_primary_branches):
+        angle = i * base_angle_increment
+        direction = rg.Vector3d(math.cos(angle), math.sin(angle), 1)
+        direction.Unitize()
+        all_breps.extend(create_branch(center, direction, primary_length, primary_radius, num_secondary_branches))
+    
+    # Create a semi-transparent shell
+    shell_radius = base_radius + 0.5
+    shell_height = height
+    shell = rg.Brep.CreateFromSphere(rg.Sphere(rg.Point3d(0, 0, shell_height / 2), shell_radius))
+    all_breps.append(shell)
+    
+    return all_breps"""
+
+try:
+    exec(function_code)
+    import ghpythonlib.treehelpers as th
+    from Grasshopper.Kernel.Data import GH_Path
+    geometry_states = []
+    # Generate sample geometry 1/5
+    geometry = generate_branching_network_shell(seed=42, base_radius=5.0, height=10.0, num_primary_branches=8, num_secondary_branches=3)
+    geometry = list(geometry) if not isinstance(geometry, list) else geometry
+    geometry_states.append(geometry)
+
+    # Generate sample geometry 2/5
+    geometry = generate_branching_network_shell(seed=101, base_radius=3.5, height=15.0, num_primary_branches=6, num_secondary_branches=4)
+    geometry = list(geometry) if not isinstance(geometry, list) else geometry
+    geometry_states.append(geometry)
+
+    # Generate sample geometry 3/5
+    geometry = generate_branching_network_shell(seed=57, base_radius=4.0, height=12.0, num_primary_branches=10, num_secondary_branches=5)
+    geometry = list(geometry) if not isinstance(geometry, list) else geometry
+    geometry_states.append(geometry)
+
+    # Generate sample geometry 4/5
+    geometry = generate_branching_network_shell(seed=23, base_radius=6.0, height=20.0, num_primary_branches=5, num_secondary_branches=2)
+    geometry = list(geometry) if not isinstance(geometry, list) else geometry
+    geometry_states.append(geometry)
+
+    # Generate sample geometry 5/5
+    geometry = generate_branching_network_shell(seed=77, base_radius=2.5, height=8.0, num_primary_branches=7, num_secondary_branches=6)
+    geometry = list(geometry) if not isinstance(geometry, list) else geometry
+    geometry_states.append(geometry)
+
+    # Convert the list of geometries to a Grasshopper DataTree
+    geometry_states = th.list_to_tree(geometry_states)
+
+    print("success")
+except Exception as e:
+    print("Error: ", e)
