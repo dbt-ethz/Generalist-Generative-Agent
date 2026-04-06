@@ -10,6 +10,9 @@ Anton Savov, Angela Yoo, CheWei Lin, Benjamin Dillenburger
 
 > **Paper:** Savov, A., Yoo, A., Lin, C., & Dillenburger, B. (2025). Generalist Generative Agent: Open-ended design exploration with large language models. *Proceedings of the 30th CAADRIA Conference*, Vol. 1, 193–202. [DOI: 10.52842/conf.caadria.2025.1.193](https://doi.org/10.52842/conf.caadria.2025.1.193)
 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19444578.svg)](https://doi.org/10.5281/zenodo.19444578)
+
 ---
 
 ## Overview
